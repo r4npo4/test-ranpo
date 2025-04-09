@@ -1,37 +1,37 @@
-# app.py
 from flask import Flask, request, render_template_string
 from pymongo import MongoClient
 
 app = Flask(__name__)
-
-client = MongoClient("mongodb://localhost:27017/")
-db = client["webtest"]
+client = MongoClient("mongodb://mongo:27017/")
+db = client["test"]
 users = db["users"]
 
-@app.route("/", methods=["GET", "POST"])
+login_page = '''
+<h2>Login</h2>
+<form method="POST">
+  Username: <input name="username"><br>
+  Password: <input name="password"><br>
+  <input type="submit" value="Login">
+</form>
+<p>{{ result }}</p>
+'''
+
+@app.route('/', methods=["GET", "POST"])
 def login():
+    result = ""
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        # Vulnerability: No SQL Injection
-        user = users.find_one({
-            "username": username,
-            "password": password
-        })
-
+        username = request.form['username']
+        password = request.form['password']
+        
+        query = {"username": username, "password": password}
+        user = users.find_one(query)
+        
         if user:
-            return f"<h3>Login success! Hello {username}</h3>"
+            result = f"Welcome, {user['username']}!"
         else:
-            return "Login failed."
+            result = "Login failed."
 
-    return render_template_string("""
-        <form method="POST">
-            Username: <input name="username"><br>
-            Password: <input name="password" type="password"><br>
-            <input type="submit" value="Login">
-        </form>
-    """)
+    return render_template_string(login_page, result=result)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
