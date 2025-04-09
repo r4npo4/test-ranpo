@@ -3,28 +3,24 @@ version: '3.8'
 services:
   mongo:
     image: mongo:4.4
-    container_name: vuln-mongo
+    container_name: nosql-mongo
     restart: always
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
     volumes:
       - mongo-data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
 
   flask:
     build: .
-    container_name: vuln-flask
+    container_name: nosql-flask
     restart: always
     ports:
       - "5000:5000"
     depends_on:
       - mongo
-    environment:
-      MONGO_URI: mongodb://admin:admin@mongo:27017/
     volumes:
-      - .:/app
+      - ./app:/app
 
 volumes:
   mongo-data:
