@@ -1,6 +1,6 @@
-// mongo-init/init.js
-db = db.getSiblingDB('test');  // use 'test' database
+db = db.getSiblingDB('test');
+db.users.deleteMany({})  
 db.users.insertOne({
-    username: "admin",
-    password: "admin"
+  username: "admin",
+  password: "admin"
 });
