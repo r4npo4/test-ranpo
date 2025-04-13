@@ -20,8 +20,13 @@ login_page = '''
 def login():
     result = ""
     if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
+        if request.is_json:
+            data = request.get_json()
+            username = data.get('username')
+            password = data.get('password')
+        else:
+            username = request.form.get('username')
+            password = request.form.get('password')
         
         query = {"username": username, "password": password}
         user = users.find_one(query)
